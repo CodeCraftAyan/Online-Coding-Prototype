@@ -160,10 +160,6 @@ TEMPLATES[0]["OPTIONS"]["context_processors"] += [
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": ["rediss://default:gQAAAAAAAT_0AAIncDIxZGNlYTdkZDA4YTg0ODQxODIwYjAzZDdhODhhZGQ3OHAyODE5MDg@electric-kingfish-81908.upstash.io:6379"],
-            "ssl_cert_reqs": None,
-        },
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
     },
 }
