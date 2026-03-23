@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Contests
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 font-sans text-gray-900">
+
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div class="lg:w-3/4 space-y-10">
+            
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <h3 class="text-xl font-bold text-gray-800">Current or Upcoming</h3>
+                </div>
+                
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <ul class="divide-y divide-gray-100">
+                        {% if upcoming_contests %}
+                        {% for contest in upcoming_contests %}
+                        <li class="group hover:bg-gray-50 transition-colors">
+                            <div class="p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-gray-900 font-semibold group-hover:text-blue-600 transition-colors">
+                                        {{ contest.title }}
+                                    </span>
+                                    <div class="flex items-center gap-3 text-xs text-gray-500">
+                                        <span><i class="bi bi-calendar3"></i> {{ contest.start_time }}</span>
+                                        <span><i class="bi bi-clock"></i> {{ contest.duration }} mins</span>
+                                        <span><i class="bi bi-person"></i> {{contest.registrations.count}} participants</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-center gap-4">
+                                    <div class="text-right hidden md:block">
+                                        <p class="text-xs font-medium text-gray-400 uppercase tracking-wider">Starts in</p>
+                                        <p class="text-sm font-mono text-gray-700">{{ contest.start_time|date:"M d, H:i" }}</p>
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                        {% if contest.start_time > now %}
+                                        <a href="{% url 'contest_register' contest.id %}">
+                                            <button class="bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold py-2 px-6 rounded-lg">
+                                                Register
+                                            </button>
+                                        </a>
+                                        {% else %}
+                                        <button class="bg-rose-600 text-white text-xs font-bold py-2 px-6 rounded-lg">
+                                            Closed
+                                        </button>
+                                        {% endif %}
+                                    {% else %}
+                                        <a href="{% url 'login' %}">
+                                            <button class="bg-gray-400 text-white text-xs font-bold py-2 px-6 rounded-lg">
+                                                Login to Register
+                                            </button>
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <li class="group hover:bg-gray-50 transition-colors">
+                            <p class="p-5 text-gray-900 font-semibold">there's no contests yet.</p>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </section>
+
+            <section>
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Past Contests</h3>
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+                    <ul class="divide-y divide-gray-100">
+                        {% if past_contests %}
+                        {% for contest in past_contests %}
+                        <li class="p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                            <div class="flex flex-col gap-1">
+                                <span class="text-gray-700 font-medium">{{ contest.title }}</span>
+                                <div class="flex items-center gap-3 text-xs text-gray-400">
+                                    <span>{{ contest.start_time|date:"M d, Y" }}</span>
+                                    <span>•</span>
+                                    <span><i class="bi bi-people"></i> {{ contest.registrations.count }} participants</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'leaderboard' contest.id %}" class="text-sm text-gray-500 hover:text-blue-600 font-medium flex items-center gap-1">
+                                Standings <i class="bi bi-chevron-right text-xs"></i>
+                            </a>
+                        </li>
+                        {% endfor %}
+                        {% else %}
+                        <li class="p-5">
+                            <p class="text-gray-500 text-sm">No past contests</p>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </section>
+        </div>
+
+        <div class="lg:w-1/4 space-y-6">
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5 transition-all hover:shadow-md">
+                <div class="flex items-center gap-2 mb-5 border-b border-gray-100 pb-3">
+                    <i class="bi bi-info-circle text-blue-500"></i>
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Pay Attention</h3>
+                </div>
+
+                {% if upcoming_contests %}
+                {% for contest in upcoming_contests %}
+                <div class="space-y-4">
+                    <div>
+                        <span class="text-[11px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full uppercase tracking-wide">
+                            Upcoming
+                        </span>
+                        <h2 class="mt-2 text-sm font-bold text-gray-900 leading-tight">
+                            <a href="" class="hover:text-blue-600 transition-colors">{{ contest.title }}</a>
+                        </h2>
+                    </div>
+
+                    <div class="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                        <p class="text-[10px] text-gray-400 uppercase font-medium mb-1">Starts In</p>
+                        <p class="text-2xl font-mono font-bold text-gray-800 tracking-tighter countdown" data-start="{{ contest.start_time|date:'Y-m-d H:i:s' }}" data-end="{{ contest.end_time|date:'Y-m-d H:i:s' }}">
+                            <!-- 25<span class="text-gray-300 mx-0.5">:</span>22<span class="text-gray-300 mx-0.5">:</span>45 -->
+                        </p>
+                    </div>
+
+                    <!-- <button class="w-full bg-gray-900 hover:bg-gray-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg transition-colors shadow-sm active:scale-[0.98]">
+                        Register Now
+                    </button> -->
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+            
+            <!-- <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-5">
+                <div class="flex items-center gap-2 mb-4 border-b border-gray-50 pb-3">
+                    <i class="bi bi-trophy text-yellow-500"></i>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-tight">Top Rated</h3>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <a href="#" class="text-sm text-red-600 hover:text-blue-600">arnab_das</a>
+                        <span class="text-xs font-mono font-bold bg-gray-50 px-2 py-0.5 rounded text-gray-500">3011</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <a href="#" class="text-sm text-purple-600 hover:text-blue-600">u_suman</a>
+                        <span class="text-xs font-mono font-bold bg-gray-50 px-2 py-0.5 rounded text-gray-500">2000</span>
+                    </div>
+                </div>
+            </div> -->
+
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                <h4 class="text-xs font-bold text-gray-400 uppercase mb-2">Notice</h4>
+                <p class="text-xs text-gray-500 leading-relaxed">
+                    Make sure to register at least 5 minutes before the contest starts. Unrated participation is permitted for most rounds.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function formatTime(ms) {
+    if (ms <= 0) return "00:00:00";
+
+    let totalSeconds = Math.floor(ms / 1000);
+    let hours = Math.floor(totalSeconds / 3600);
+    let minutes = Math.floor((totalSeconds % 3600) / 60);
+    let seconds = totalSeconds % 60;
+
+    return (
+        String(hours).padStart(2, '0') + ":" +
+        String(minutes).padStart(2, '0') + ":" +
+        String(seconds).padStart(2, '0')
+    );
+}
+
+function updateCountdowns() {
+    const now = new Date().getTime();
+
+    document.querySelectorAll(".countdown").forEach(el => {
+        const start = new Date(el.dataset.start.replace(" ", "T")).getTime();
+        const end = new Date(el.dataset.end.replace(" ", "T")).getTime();
+
+        if (now < start) {
+            el.innerText = formatTime(start - now); // upcoming
+        } else if (now >= start && now <= end) {
+            el.innerText = "LIVE";
+        } else {
+            el.innerText = "Finished";
+        }
+            });
+        }
+
+// update every second
+setInterval(updateCountdowns, 1000);
+updateCountdowns();
+</script>
+
+{% endblock %}

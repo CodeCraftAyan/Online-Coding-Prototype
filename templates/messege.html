@@ -1,0 +1,82 @@
+{% if messages %}
+    {% for message in messages %}
+        <div id="warning-toast" 
+            class="fixed bottom-5 right-5 z-[100] max-w-sm w-full transform transition-all duration-700 ease-[cubic-bezier(0.18,0.89,0.32,1.28)] translate-x-full opacity-0">
+            
+            <div class="flex items-center justify-between p-4 bg-white border rounded-xl shadow-2xl border-l-4
+                {% if message.tags == 'success' %}
+                    border-green-200 border-l-green-500
+                {% elif message.tags == 'error' %}
+                    border-red-200 border-l-red-500
+                {% elif message.tags == 'warning' %}
+                    border-amber-200 border-l-amber-500
+                {% elif message.tags == 'info' %}
+                    border-blue-200 border-l-blue-500
+                {% else %}
+                    border-gray-200 border-l-gray-500
+                {% endif %}
+             ">
+                
+                <div class="flex items-center gap-3">
+                    <div class="flex-shrink-0">
+                        {% if message.tags == 'success' %}
+                            <i class="bi bi-check-circle font-bold text-lg text-green-500"></i>
+                        {% elif message.tags == 'error' %}
+                            <i class="bi bi-exclamation-octagon font-bold text-lg text-red-500"></i>
+                        {% elif message.tags == 'warning' %}
+                            <i class="bi bi-exclamation-triangle font-bold text-lg text-amber-500"></i>
+                        {% elif message.tags == 'info' %}
+                            <i class="bi bi-info-circle font-bold text-lg text-blue-500"></i>
+                        {% else %}
+                            <i class="bi bi-exclamation-lg font-bold text-lg text-gray-500"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <div>
+                        <h2 class="text-sm font-bold text-gray-900 leading-none">{{ message.tags|capfirst }}</h2>
+                        <p class="text-xs text-gray-600 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+        
+                <button id="close-toast" class="ml-4 p-1.5 rounded-md hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
+                    <i class="bi bi-x text-lg"></i>
+                </button>
+                
+            </div>
+        </div>
+        
+        
+    {% endfor %}
+{% endif %}
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const toast = document.getElementById('warning-toast');
+        const closeBtn = document.getElementById('close-toast');
+        
+        // 1. Entrance Animation (Slide In)
+        setTimeout(() => {
+            toast.classList.remove('translate-x-full', 'opacity-0');
+            toast.classList.add('translate-x-0', 'opacity-100');
+        }, 100);
+
+        // Function to dismiss
+        const dismissToast = () => {
+            // Slide out to the right and fade
+            toast.classList.add('translate-x-full', 'opacity-0');
+            toast.classList.remove('translate-x-0', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.remove(); // Clean up DOM
+            }, 700);
+        };
+
+        // 2. Manual Close
+        closeBtn.addEventListener('click', dismissToast);
+
+        // 3. Auto Close after 5 seconds
+        setTimeout(dismissToast, 8000);
+    });
+
+</script>

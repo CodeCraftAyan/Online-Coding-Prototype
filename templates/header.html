@@ -1,0 +1,80 @@
+<nav class="fixed-header sticky top-0 z-50 w-full bg-white/70 backdrop-blur-md border-b border-gray-100 transition-all duration-300">
+    <div class="max-w-7xl mx-auto h-16 px-4 sm:px-6 flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <a href="{% url 'index' %}" class="flex items-center group">
+                <div class="w-8 h-8 bg-black rounded-lg flex items-center justify-center mr-3 group-hover:scale-105 transition-transform">
+                    <i class="bi bi-code-slash text-lg text-white"></i>
+                </div>
+                <span class="text-xl tracking-tighter text-black">
+                    <span class="font-black">ONLINE</span> <span class="text-gray-400 font-medium">CODING</span>
+                </span>
+            </a>
+        </div>
+
+        <ul class="flex items-center gap-1 text-[11px] font-black uppercase tracking-widest text-gray-400">
+            <li><a href="{% url 'index' %}" class="px-4 py-2 rounded-xl hover:bg-black hover:text-white transition-all">Home</a></li>
+            <li><a href="{% url 'home' %}" class="px-4 py-2 rounded-xl hover:bg-black hover:text-white transition-all">Problems</a></li>
+            <li><a href="{% url 'contest_list' %}" class="px-4 py-2 rounded-xl hover:bg-black hover:text-white transition-all">Contests</a></li>
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'submissions' %}" class="px-4 py-2 rounded-xl hover:bg-black hover:text-white transition-all">Submissions</a></li>
+            {% endif %}
+            
+            <li class="ml-4 pl-4 border-l border-gray-200 flex items-center gap-2">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'profile' user.username %}" class="block group" title="View Profile">
+                        <div class="w-9 h-9 bg-gray-50 border border-gray-100 rounded-full flex items-center justify-center group-hover:border-black group-hover:bg-white transition-all">
+                            <i class="bi bi-person text-lg text-gray-400 group-hover:text-black"></i>
+                        </div>
+                    </a>
+                    <form action="{% url 'logout' %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-all shadow-sm">LOGOUT</button>
+                    </form>
+                {% else %}
+                    <a href="{% url 'login' %}" class="px-5 py-2 bg-black text-white rounded-full hover:bg-gray-800 transition-all shadow-sm">JOIN NOW</a>
+                {% endif %}
+            </li>
+        </ul>
+    </div>
+
+    <div class="hidden max-w-7xl mx-auto px-6">
+        <div class="flex items-center justify-between h-14">
+            
+            <nav class="h-full">
+                <ul class="flex items-center gap-2 h-full">
+                    <li class="h-full flex items-center">
+                        <a href="#" class="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest bg-black text-white transition-all">
+                            Problems
+                        </a>
+                    </li>
+                    <li class="h-full flex items-center">
+                        <a href="#" class="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-black hover:bg-gray-50 transition-all">
+                            Submit
+                        </a>
+                    </li>
+                    <li class="h-full flex items-center">
+                        <a href="#" class="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-black hover:bg-gray-50 transition-all">
+                            Status
+                        </a>
+                    </li>
+                    <li class="h-full flex items-center">
+                        <a href="#" class="px-4 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-gray-400 hover:text-black hover:bg-gray-50 transition-all">
+                            Standings
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="hidden md:flex items-center gap-6">
+                <div class="flex flex-col items-end">
+                    <span class="text-[9px] font-black text-gray-300 uppercase leading-none mb-1">Server Time</span>
+                    <span class="text-xs font-mono font-bold text-gray-900">22:04:15</span>
+                </div>
+                <div class="h-8 w-[1px] bg-gray-100"></div>
+                <span class="text-[10px] font-bold text-gray-500 bg-gray-50 px-3 py-1 rounded-full border border-gray-100">
+                    CID: 1024
+                </span>
+            </div>
+        </div>
+    </div>
+</nav>

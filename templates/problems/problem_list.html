@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Code Evaluation
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-6xl mx-auto py-8 px-4">
+    <div class="flex items-center justify-between border-b border-gray-200 pb-5 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Problems</h2>
+            <p class="text-sm text-gray-500 mt-1">Select a challenge to begin coding.</p>
+        </div>
+        <!-- <a href="{% url 'create_problem' %}" class="inline-flex items-center gap-2 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold py-2 px-4 rounded-lg transition-colors shadow-sm">
+            <i class="bi bi-plus text-lg"></i>
+            Create Problem
+        </a> -->
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        {% if problems %}
+            <ul class="divide-y divide-gray-100">
+                {% for problem in problems %}
+                <li>
+                    <a href="{% url 'problem' problem_id=problem.problem_id %}" class="group flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                        <div class="flex items-center gap-4">
+                            <span class="text-xs font-mono text-gray-400 bg-gray-50 px-2 py-1 rounded">#{{ problem.problem_id }}</span>
+                            <span class="text-gray-700 font-medium group-hover:text-blue-600 transition-colors">
+                                {{ problem.title }}
+                            </span>
+                        </div>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-300 group-hover:text-blue-500 transform group-hover:translate-x-1 transition-all" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="p-12 text-center">
+                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-50 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h3 class="text-sm font-semibold text-gray-900">No problems found</h3>
+                <p class="text-sm text-gray-500 mt-1">Get started by creating your first challenge.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

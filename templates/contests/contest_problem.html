@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{{ contest.title }} | {{ problem.code }}. {{ problem.title }}
+{% endblock %}
+
+{% block content %}
+
+<div class="max-w-8xl mx-auto px-4">
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <div class="lg:w-1/2">
+            <div class="text-center mb-10 pb-6 border-b border-gray-100">
+                <h2 class="text-3xl font-bold text-gray-900 tracking-tight mb-3">{{ problem.code }}. {{ problem.title }}</h2>
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-[13px] text-gray-500 font-medium">
+                    <p>Time limit: <span class="text-gray-800">{{ problem.time_limit }} seconds</span></p>
+                    <p>Memory limit: <span class="text-gray-800">{{ problem.memory_limit }} megabytes</span></p>
+                    <p>Input: <span class="text-gray-800">standard input</span></p>
+                    <p>Output: <span class="text-gray-800">standard output</span></p>
+                </div>
+            </div>
+
+            <div class="prose prose-slate max-w-none text-[15px] leading-relaxed text-gray-700 space-y-5 mb-10">
+                {{ problem.statement|linebreaks }}
+            </div>
+
+            <div class="space-y-8 mb-10">
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3 border-l-4 border-gray-900 pl-3">Input</h3>
+                    <div class="text-[15px] text-gray-700 space-y-2">
+                        {{ problem.input_format|linebreaks }}
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3 border-l-4 border-gray-900 pl-3">Output</h3>
+                    {{ problem.output_format|linebreaks }}
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                
+                {% with has_sample=False %}
+                {% for tc in problem.testcases.all %}
+                {% if tc.is_sample %}
+                    {% if not has_sample %}
+                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3 border-l-4 border-gray-900 pl-3">Example {{ forloop.counter }}</h3>
+                    {% endif %}
+                
+                <div class="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm font-mono text-sm">
+                    <div class="p-4 border-b border-gray-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Input</span>
+                            <button class="text-blue-600 hover:text-blue-800 text-[10px] font-bold uppercase transition-colors">Copy</button>
+                        </div>
+                        <pre class="text-gray-800 bg-gray-50 p-3 rounded-md">{{ tc.input_data }}</pre>
+                    </div>
+                    
+                    <div class="p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Output</span>
+                            <button class="text-blue-600 hover:text-blue-800 text-[10px] font-bold uppercase transition-colors">Copy</button>
+                        </div>
+                        <pre class="text-gray-800 bg-gray-50 p-3 rounded-md">{{ tc.expected_output }}</pre>
+                    </div>
+                </div>
+                {% endif %}
+                {% empty %}
+                <p class="text-gray-500">No sample testcases.</p>
+                {% endfor %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <div class="lg:w-1/2 space-y-2">
+            
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="bi bi-clock-history text-blue-500"></i>
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Contest Ending In</h3>
+                </div>
+                <div class="bg-gray-50 rounded-lg text-center border border-gray-100">
+                    <p class="text-2xl font-mono font-bold text-gray-800 tracking-tighter" id="countdown" data-start="{{ contest.start_time|date:'Y-m-d H:i:s' }}" data-end="{{ contest.end_time|date:'Y-m-d H:i:s' }}">
+                        <!-- 02 <span class="text-gray-300">:</span> 12 <span class="text-gray-300">:</span> 54 -->
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+                <h3 class="text-sm font-bold text-gray-900 mb-5 flex items-center">
+                    <span class="w-1.5 h-1.5 bg-blue-500 rounded-full mr-2"></span>
+                    Submit Solution
+                </h3>
+                
+                <form action="" method="POST" enctype="multipart/form-data" class="space-y-5" id="submit-form">
+                    {% csrf_token %}
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase">Language</label>
+                        <select name="language" class="w-full bg-white border border-gray-200 rounded-lg py-2 px-3 text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all">
+                            <option value="java">Java 21</option>
+                            <option value="c">GNU C11 - C</option>
+                            <option value="cpp">GNU G++20 - C++</option>
+                            <option value="python">Python 3.12</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-bold text-gray-400 mb-1.5 uppercase">Code Solution</label>
+                        <textarea name="code" id="code" rows="14" placeholder="Write your code here..." class="w-full font-mono text-sm border border-gray-200 rounded-lg p-3 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none transition-all resize-none"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-gray-900 text-white text-xs font-bold py-3 rounded-lg hover:bg-gray-800 transition-all shadow-sm active:scale-[0.98]">
+                        Submit Solution
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+function updateCountdown() {
+    const el = document.getElementById("countdown");
+    if (!el) return;
+
+    const start = new Date(el.dataset.start.replace(" ", "T")).getTime();
+    const end = new Date(el.dataset.end.replace(" ", "T")).getTime();
+    const now = new Date().getTime();
+
+    if (now >= start && now < end) {
+        let diff = end - now;
+
+        let h = Math.floor(diff / 3600000);
+        let m = Math.floor((diff % 3600000) / 60000);
+        let s = Math.floor((diff % 60000) / 1000);
+
+        el.innerText =
+            String(h).padStart(2, '0') + " : " +
+            String(m).padStart(2, '0') + " : " +
+            String(s).padStart(2, '0');
+    } else {
+        el.innerText = "00 : 00 : 00";
+    }
+}
+
+setInterval(updateCountdown, 1000);
+updateCountdown();
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Initialize CodeMirror
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+        mode: "python",
+        theme: "material",
+        lineNumbers: true,
+        autoCloseBrackets: true,
+        lineWrapping: true,
+        matchBrackets: true
+    });
+
+    window.editor = editor;
+
+    // Language dropdown
+    const langSelect = document.querySelector("select[name='language']");
+
+    function updateMode(lang) {
+        if (lang === "python") {
+            editor.setOption("mode", "python");
+        } 
+        else if (lang === "cpp") {
+            editor.setOption("mode", "text/x-c++src");
+        } 
+        else if (lang === "c") {
+            editor.setOption("mode", "text/x-csrc");
+        } 
+        else if (lang === "java") {
+            editor.setOption("mode", "text/x-java");
+        }
+    }
+
+    // Initial mode
+    updateMode(langSelect.value);
+
+    // Change mode on language change
+    langSelect.addEventListener("change", function () {
+        updateMode(this.value);
+    });
+
+});
+</script>
+{% endblock %}

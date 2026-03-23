@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Login / Register
+{% endblock %}
+
+{% block content %}
+
+<div class="flex items-center justify-center bg-gray-50 py-8 px-4 sm:px-6 lg:px-8 font-sans">
+    <div class="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl border border-gray-200 shadow-sm relative overflow-hidden" id="authContainer">
+        
+        <div class="absolute top-0 right-0 -mt-10 -mr-10 w-32 h-32 bg-gray-50 rounded-full blur-3xl opacity-50"></div>
+
+        <div class="flex p-1 bg-gray-100 rounded-xl mb-8">
+            <button id="loginTab" onclick="switchTab('login')" class="flex-1 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all bg-white text-black shadow-sm">
+                Login
+            </button>
+            <button id="registerTab" onclick="switchTab('register')" class="flex-1 py-2 text-xs font-black uppercase tracking-widest rounded-lg transition-all text-gray-400">
+                Register
+            </button>
+        </div>
+
+        <div id="loginForm" class="space-y-6">
+            <div class="text-center">
+                <h2 class="text-3xl font-black tracking-tighter text-black">Welcome Back</h2>
+                <p class="text-sm text-gray-400 mt-2 italic">Continue your journey</p>
+            </div>
+            <form action="/login/" method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">User ID</label>
+                    <input type="text" name="user_id" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="e.g. john_doe">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
+                    <input type="password" name="password" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-4 bg-black text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-gray-800 transition-all transform active:scale-[0.98]">
+                    Sign In
+                </button>
+            </form>
+        </div>
+
+        <div id="registerForm" class="space-y-6 hidden">
+            <div class="text-center">
+                <h2 class="text-3xl font-black tracking-tighter text-black">Join the Elite Community</h2>
+                <p class="text-sm text-gray-400 mt-2 italic">Create your user ID</p>
+            </div>
+            <form action="/register/" method="POST" class="space-y-4">
+                {% csrf_token %}
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Username</label>
+                        <input type="text" name="username" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">User ID</label>
+                        <input type="text" name="user_id" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="john_doe">
+                    </div>
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Email Address</label>
+                    <input type="email" name="email" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="example@gmail.com">
+                </div>
+                <div>
+                    <label class="text-[10px] font-black uppercase tracking-widest text-gray-400 ml-1">Password</label>
+                    <input type="password" name="password" required class="w-full mt-1 px-4 py-3 rounded-xl border border-gray-100 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all text-sm" placeholder="••••••••">
+                </div>
+                <button type="submit" class="w-full py-4 bg-black text-white rounded-xl font-black uppercase tracking-widest text-xs hover:bg-red-600 transition-all transform active:scale-[0.98]">
+                    Create Account
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchTab(type) {
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const loginTab = document.getElementById('loginTab');
+        const registerTab = document.getElementById('registerTab');
+
+        if (type === 'register') {
+            loginForm.classList.add('hidden');
+            registerForm.classList.remove('hidden');
+            // Tab styling
+            registerTab.classList.add('bg-white', 'text-black', 'shadow-sm');
+            registerTab.classList.remove('text-gray-400');
+            loginTab.classList.remove('bg-white', 'text-black', 'shadow-sm');
+            loginTab.classList.add('text-gray-400');
+        } else {
+            registerForm.classList.add('hidden');
+            loginForm.classList.remove('hidden');
+            // Tab styling
+            loginTab.classList.add('bg-white', 'text-black', 'shadow-sm');
+            loginTab.classList.remove('text-gray-400');
+            registerTab.classList.remove('bg-white', 'text-black', 'shadow-sm');
+            registerTab.classList.add('text-gray-400');
+        }
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard - {{ contest.title }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 max-w-7xl">
+
+    <!-- 🔥 TOP 3 -->
+    <div class="flex flex-col md:flex-row gap-4 mb-10 items-stretch">
+
+        {% for entry in leaderboard|slice:":3" %}
+        <div class="{% if forloop.first %}flex-[1.1] border-2 border-blue-500{% else %}flex-1 border{% endif %}
+            bg-white border-gray-200 rounded-xl p-5 flex items-center justify-between
+            transition-all duration-300 hover:shadow-md group">
+
+            <div class="flex items-center gap-4">
+                <span class="{% if forloop.first %}text-3xl text-blue-200{% else %}text-2xl text-gray-200{% endif %}
+                    font-black italic">
+                    {{ forloop.counter|stringformat:"02d" }}
+                </span>
+
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase">
+                        {{ entry.user.username }}
+                    </h3>
+                    <p class="text-[10px] text-gray-400 uppercase">
+                        Rank {{ entry.rank }}
+                    </p>
+                </div>
+            </div>
+
+            <div class="text-right">
+                <span class="block font-mono font-bold text-gray-900">
+                    {{ entry.solved }}
+                </span>
+                <span class="text-[9px] text-gray-400 uppercase">Solved</span>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+    <!-- 🔥 TABLE -->
+    <div class="overflow-hidden bg-white shadow-sm rounded-xl border border-gray-200">
+        <table class="min-w-full divide-y divide-gray-200">
+
+            <thead class="bg-gray-50 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                <tr>
+                    <th class="px-8 py-5 text-left"># Rank</th>
+                    <th class="px-8 py-5 text-left">Participant</th>
+                    <th class="px-8 py-5 text-center">Solved</th>
+                    <th class="px-8 py-5 text-right">Penalty</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100 text-sm">
+                {% for entry in leaderboard %}
+                <tr class="hover:bg-blue-50/20 transition-all duration-150">
+
+                    <td class="px-8 py-5 font-mono text-xs text-gray-400">
+                        {{ entry.rank|stringformat:"02d" }}
+                    </td>
+
+                    <td class="px-8 py-5">
+                        <a href="{% url 'profile' entry.user.username %}" class="text-xs font-bold text-gray-800 uppercase hover:text-blue-600">
+                            {{ entry.user.username }}
+                        </a>
+                    </td>
+
+                    <td class="px-8 py-5 text-center font-mono">
+                        {{ entry.solved }}
+                    </td>
+
+                    <td class="px-8 py-5 text-right font-mono font-bold">
+                        {{ entry.penalty }}
+                    </td>
+
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</div>
+{% endblock %}
+
+
+

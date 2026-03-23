@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Home | Online Coding
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[70vh] flex flex-col justify-center selection:bg-black selection:text-white">
+    
+    <div class="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-20">
+        
+        <div class="w-full lg:w-1/2 order-2 lg:order-1 text-center lg:text-left">
+            <div class="inline-flex items-center px-4 py-2 rounded-full bg-gray-50 border border-gray-100 mb-6 group hover:border-black transition-all cursor-default">
+                <span class="w-2 h-2 rounded-full bg-black animate-pulse mr-2"></span>
+                <span class="text-xs font-bold uppercase tracking-widest text-gray-500">System Online</span>
+            </div>
+            
+            <h1 class="text-5xl md:text-6xl font-black tracking-tighter text-black leading-[1.1] mb-6">
+                WELCOME TO <br>
+                <span class="text-gray-300">ONLINE</span> CODING
+            </h1>
+
+            <div class="flex flex-wrap items-center justify-center lg:justify-start gap-4 mb-8">
+                {% if user.is_authenticated %}
+                <div class="flex items-center gap-3 p-2 pr-6 rounded-full bg-white border border-gray-100 shadow-sm">
+                    <div class="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white font-black text-xs">
+                        {{ user.username|slice:":1"|upper }}
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-gray-400 leading-none">Logged in as</p>
+                        <p class="text-sm font-bold text-black">{{ user.username }}</p>
+                    </div>
+                </div>
+                {% else %}
+                <a href="{% url 'login' %}" class="px-6 py-3.5 bg-black text-white rounded-xl font-bold uppercase tracking-wider text-sm hover:bg-red-600 transition-all shadow-lg hover:-translate-y-0.5">
+                    Initialize Session
+                </a>
+                <a href="{% url 'home' %}" class="px-6 py-3.5 bg-white text-black border border-gray-200 rounded-xl font-bold uppercase tracking-wider text-sm hover:border-black transition-all">
+                    View Problems
+                </a>
+                {% endif %}
+            </div>
+
+            <p class="text-gray-400 font-medium text-base md:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed italic">
+                "Justice will prevail, you say? But of course it will! Whoever wins this war becomes justice!"
+            </p>
+        </div>
+
+        <div class="w-full lg:w-[55%] order-1 lg:order-2">
+            <div class="relative group">
+                <div class="absolute -inset-4 bg-gray-100 rounded-[3rem] blur-2xl opacity-50 group-hover:opacity-80 transition-opacity"></div>
+                
+                <div class="relative overflow-hidden rounded-[2.5rem] border-8 border-white shadow-2xl bg-white">
+                    <img src="https://i.pinimg.com/originals/63/78/3d/63783d95c96223b47b75a615474eab25.gif" 
+                         alt="hero" 
+                         class="w-full h-auto grayscale hover:grayscale-0 transition-all duration-1000 ease-in-out transform group-hover:scale-105">
+                    
+                    <div class="absolute bottom-6 left-6 right-6 p-4 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl">
+                        <div class="flex justify-between items-center">
+                            <span class="text-[10px] font-black text-white uppercase tracking-[0.3em]">
+                                {% if user.is_authenticated %}
+                                    OPERATOR: {{ user.username }} // STATUS: ACTIVE
+                                {% else %}
+                                    STATUS: UNRESTRICTED // LOGIN 
+                                {% endif %}
+                            </span>
+                            <div class="flex gap-1">
+                                <div class="w-1.5 h-1.5 rounded-full bg-white/40"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-white/40"></div>
+                                <div class="w-1.5 h-1.5 rounded-full bg-white"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    body { background-color: #fdfdfd; overflow-x: hidden; }
+    
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+    
+    .hero-animate {
+        animation: float 6s ease-in-out infinite;
+    }
+</style>
+{% endblock %}

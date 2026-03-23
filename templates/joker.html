@@ -1,0 +1,83 @@
+{% load static %}
+
+<div id="video-overlay"
+     class="hidden fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-500">
+
+    <video
+        id="promo-video"
+        class="w-full h-full object-cover"
+        src="{% static 'joker_shuffled.mp4' %}"
+        playsinline>
+    </video>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const overlay = document.getElementById('video-overlay');
+    const video = document.getElementById('promo-video');
+
+    if (!overlay || !video) {
+        console.warn("⚠️ joker.html not loaded on this page");
+        return;
+    }
+
+    function playVideo(triggerTime) {
+        localStorage.setItem("video_trigger", triggerTime);
+
+        overlay.classList.remove("hidden");
+        overlay.classList.remove("opacity-0");
+
+        video.currentTime = 0;
+        video.muted = false;
+
+        video.play().catch(() => {
+            video.muted = false;
+            video.play();
+        });
+
+        video.onended = () => {
+            overlay.classList.add("opacity-0");
+
+            setTimeout(() => {
+                overlay.classList.add("hidden");
+            }, 500);
+        };
+    }
+
+    let socket;
+
+    try {
+        const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+        socket = new WebSocket(protocol + window.location.host + "/ws/video/");
+    } catch (err) {
+        console.error("WebSocket init failed:", err);
+        return;
+    }
+
+    socket.onopen = () => {
+        console.log("WebSocket connected ✅");
+    };
+
+    socket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+
+        let trigger = String(data.video_triggered_at);
+        let lastPlayed = localStorage.getItem("video_trigger");
+
+        if (trigger !== lastPlayed) {
+            playVideo(trigger);
+        }
+    };
+
+    socket.onerror = (err) => {
+        console.error("WebSocket error:", err);
+    };
+
+    socket.onclose = function() {
+        console.log("WebSocket disconnected ❌");
+    };
+
+});
+</script>
