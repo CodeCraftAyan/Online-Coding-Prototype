@@ -4,6 +4,7 @@ import asyncio
 
 class VideoConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        await self.accept()
         await self.channel_layer.group_add("video_group", self.channel_name)
         await self.accept()
 

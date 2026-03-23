@@ -19,7 +19,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'prototype.settings')
 django_asgi_app = get_asgi_application()
 
 application = ProtocolTypeRouter({
-    "http": ASGIStaticFilesHandler(django_asgi_app),
+    "http": django_asgi_app,
     "websocket": AuthMiddlewareStack(
         URLRouter(
             contests.routing.websocket_urlpatterns
