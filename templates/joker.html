@@ -1,106 +1,66 @@
 {% load static %}
 
 <div id="video-overlay"
-     class="hidden fixed inset-0 z-[9999] bg-black flex items-center justify-center transition-opacity duration-500">
+     class="hidden fixed inset-0 z-[9999] bg-black flex items-center justify-center flex-col text-white">
+
+    <p id="tap-text" class="text-xl mb-4 animate-pulse">
+        Tap anywhere to play video.
+    </p>
 
     <video
         id="promo-video"
-        class="w-full h-full object-cover"
+        class="w-full h-full object-cover hidden"
         src="{% static 'joker_shuffled.mp4' %}"
-        playsinline
-        muted
-        autoplay>
+        playsinline>
     </video>
 
-
 </div>
+
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {
 
     const overlay = document.getElementById('video-overlay');
     const video = document.getElementById('promo-video');
+    const tapText = document.getElementById('tap-text');
 
-    if (!overlay || !video) {
-        console.warn("⚠️ joker.html not loaded on this page");
-        return;
-    }
-
-    // 🔊 Check if user already enabled audio
-    let userInteracted = localStorage.getItem("audio_enabled") === "true";
-
-    // 📦 Store pending trigger if tab inactive
     let pendingTrigger = null;
 
-    // 🎯 Unlock audio on first interaction
-    function enableAudio() {
-        if (!userInteracted) {
-            userInteracted = true;
-            localStorage.setItem("audio_enabled", "true");
-            console.log("🔊 Audio unlocked");
-
-            // 🔥 Retry play if video was blocked
-            if (video.paused && pendingTrigger) {
-                playVideo(pendingTrigger);
-                pendingTrigger = null;
-            }
-        }
-    }
-
-    document.addEventListener("click", enableAudio, { once: true });
-    document.addEventListener("keydown", enableAudio, { once: true });
-
-    function playVideo(triggerTime) {
-
-        // 🚫 If tab not active → delay playback
-        if (document.visibilityState !== "visible") {
-            console.warn("⚠️ Tab inactive, delaying video");
-            pendingTrigger = triggerTime;
-            return;
-        }
-
-        localStorage.setItem("video_trigger", triggerTime);
+    function showTapToPlay(triggerTime) {
+        pendingTrigger = triggerTime;
 
         overlay.classList.remove("hidden");
-        overlay.classList.remove("opacity-0");
+        tapText.classList.remove("hidden");
+        video.classList.add("hidden");
+
+        console.log("🟡 Waiting for user interaction...");
+    }
+
+    function playVideo() {
+        if (!pendingTrigger) return;
+
+        localStorage.setItem("video_trigger", pendingTrigger);
+
+        tapText.classList.add("hidden");
+        video.classList.remove("hidden");
 
         video.currentTime = 0;
+        video.muted = false;
 
-        // 🔊 Apply mute logic
-        video.muted = !userInteracted;
-
-        const playPromise = video.play();
-
-        if (playPromise !== undefined) {
-            playPromise.catch((err) => {
-                console.warn("⚠️ Playback failed:", err);
-
-                // 🔁 Retry once after small delay
-                setTimeout(() => {
-                    video.play().catch(e => {
-                        console.warn("❌ Retry failed:", e);
-                    });
-                }, 500);
-            });
-        }
+        video.play().then(() => {
+            console.log("🔊 Video playing with sound");
+        }).catch(err => {
+            console.warn("❌ Play failed:", err);
+        });
 
         video.onended = () => {
-            overlay.classList.add("opacity-0");
-
-            setTimeout(() => {
-                overlay.classList.add("hidden");
-            }, 500);
+            overlay.classList.add("hidden");
+            pendingTrigger = null;
         };
     }
 
-    // 🔄 Resume video if user returns to tab
-    document.addEventListener("visibilitychange", () => {
-        if (document.visibilityState === "visible" && pendingTrigger) {
-            console.log("🔁 Resuming delayed video");
-            playVideo(pendingTrigger);
-            pendingTrigger = null;
-        }
-    });
+    // 🔥 THIS is the key (user interaction)
+    overlay.addEventListener("click", playVideo);
 
     let socket;
 
@@ -115,25 +75,19 @@ document.addEventListener("DOMContentLoaded", function () {
         socket.onmessage = function(e) {
             const data = JSON.parse(e.data);
 
-            // 🔥 Ignore ping
             if (data.type === "ping") return;
 
             let trigger = String(data.video_triggered_at);
             let lastPlayed = localStorage.getItem("video_trigger");
 
             if (trigger !== lastPlayed) {
-                playVideo(trigger);
+                showTapToPlay(trigger);
             }
         };
 
-        socket.onerror = (err) => {
-            console.error("WebSocket error:", err);
-        };
+        socket.onclose = function() {
+            console.log("WebSocket disconnected ❌");
 
-        socket.onclose = function(e) {
-            console.log("WebSocket disconnected ❌", e);
-
-            // 🔁 Auto reconnect
             setTimeout(() => {
                 console.log("Reconnecting...");
                 connectWebSocket();
@@ -141,9 +95,9 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    // 🚀 Start WebSocket
     connectWebSocket();
 
 });
 </script>
+
 
