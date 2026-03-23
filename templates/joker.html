@@ -23,6 +23,21 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
+    // 🔊 Check if user already enabled audio before
+    let userInteracted = localStorage.getItem("audio_enabled") === "true";
+
+    // 🎯 Unlock audio on first interaction (only once)
+    function enableAudio() {
+        if (!userInteracted) {
+            userInteracted = true;
+            localStorage.setItem("audio_enabled", "true");
+            console.log("🔊 Audio unlocked");
+        }
+    }
+
+    document.addEventListener("click", enableAudio, { once: true });
+    document.addEventListener("keydown", enableAudio, { once: true });
+
     function playVideo(triggerTime) {
         localStorage.setItem("video_trigger", triggerTime);
 
@@ -30,12 +45,17 @@ document.addEventListener("DOMContentLoaded", function () {
         overlay.classList.remove("opacity-0");
 
         video.currentTime = 0;
-        video.muted = false;
 
-        video.play().catch(() => {
-            video.muted = true;
-            video.play();
-        });
+        // 🔊 Decide mute based on interaction
+        video.muted = !userInteracted;
+
+        const playPromise = video.play();
+
+        if (playPromise !== undefined) {
+            playPromise.catch((err) => {
+                console.warn("⚠️ Playback failed:", err);
+            });
+        }
 
         video.onended = () => {
             overlay.classList.add("opacity-0");
@@ -74,10 +94,10 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("WebSocket error:", err);
         };
 
-        socket.onclose = function() {
-            console.log("WebSocket disconnected ❌");
+        socket.onclose = function(e) {
+            console.log("WebSocket disconnected ❌", e);
 
-            // 🔥 AUTO RECONNECT (IMPORTANT)
+            // 🔁 Auto reconnect
             setTimeout(() => {
                 console.log("Reconnecting...");
                 connectWebSocket();
@@ -85,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
         };
     }
 
-    // 🚀 start connection
+    // 🚀 Start WebSocket
     connectWebSocket();
 
 });
