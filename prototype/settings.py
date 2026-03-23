@@ -152,8 +152,17 @@ TEMPLATES[0]["OPTIONS"]["context_processors"] += [
     "contests.context_processors.site_settings",
 ]
 
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels.layers.InMemoryChannelLayer",
+#     },
+# }
+
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": ["rediss://default:gQAAAAAAAT_0AAIncDIxZGNlYTdkZDA4YTg0ODQxODIwYjAzZDdhODhhZGQ3OHAyODE5MDg@electric-kingfish-81908.upstash.io:6379"],
+        },
     },
 }

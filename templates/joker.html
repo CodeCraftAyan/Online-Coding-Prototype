@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", function () {
         video.muted = false;
 
         video.play().catch(() => {
-            video.muted = false;
+            video.muted = true;
             video.play();
         });
 
@@ -48,36 +48,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let socket;
 
-    try {
+    function connectWebSocket() {
         const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
         socket = new WebSocket(protocol + window.location.host + "/ws/video/");
-    } catch (err) {
-        console.error("WebSocket init failed:", err);
-        return;
+
+        socket.onopen = () => {
+            console.log("WebSocket connected ✅");
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+
+            // 🔥 ignore keep-alive ping
+            if (data.type === "ping") return;
+
+            let trigger = String(data.video_triggered_at);
+            let lastPlayed = localStorage.getItem("video_trigger");
+
+            if (trigger !== lastPlayed) {
+                playVideo(trigger);
+            }
+        };
+
+        socket.onerror = (err) => {
+            console.error("WebSocket error:", err);
+        };
+
+        socket.onclose = function() {
+            console.log("WebSocket disconnected ❌");
+
+            // 🔥 AUTO RECONNECT (IMPORTANT)
+            setTimeout(() => {
+                console.log("Reconnecting...");
+                connectWebSocket();
+            }, 3000);
+        };
     }
 
-    socket.onopen = () => {
-        console.log("WebSocket connected ✅");
-    };
-
-    socket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-
-        let trigger = String(data.video_triggered_at);
-        let lastPlayed = localStorage.getItem("video_trigger");
-
-        if (trigger !== lastPlayed) {
-            playVideo(trigger);
-        }
-    };
-
-    socket.onerror = (err) => {
-        console.error("WebSocket error:", err);
-    };
-
-    socket.onclose = function() {
-        console.log("WebSocket disconnected ❌");
-    };
+    // 🚀 start connection
+    connectWebSocket();
 
 });
 </script>
