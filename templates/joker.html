@@ -7,8 +7,11 @@
         id="promo-video"
         class="w-full h-full object-cover"
         src="{% static 'joker_shuffled.mp4' %}"
-        playsinline>
+        playsinline
+        muted
+        autoplay>
     </video>
+
 
 </div>
 
@@ -23,15 +26,24 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
     }
 
-    // 🔊 Check if user already enabled audio before
+    // 🔊 Check if user already enabled audio
     let userInteracted = localStorage.getItem("audio_enabled") === "true";
 
-    // 🎯 Unlock audio on first interaction (only once)
+    // 📦 Store pending trigger if tab inactive
+    let pendingTrigger = null;
+
+    // 🎯 Unlock audio on first interaction
     function enableAudio() {
         if (!userInteracted) {
             userInteracted = true;
             localStorage.setItem("audio_enabled", "true");
             console.log("🔊 Audio unlocked");
+
+            // 🔥 Retry play if video was blocked
+            if (video.paused && pendingTrigger) {
+                playVideo(pendingTrigger);
+                pendingTrigger = null;
+            }
         }
     }
 
@@ -39,6 +51,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("keydown", enableAudio, { once: true });
 
     function playVideo(triggerTime) {
+
+        // 🚫 If tab not active → delay playback
+        if (document.visibilityState !== "visible") {
+            console.warn("⚠️ Tab inactive, delaying video");
+            pendingTrigger = triggerTime;
+            return;
+        }
+
         localStorage.setItem("video_trigger", triggerTime);
 
         overlay.classList.remove("hidden");
@@ -46,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         video.currentTime = 0;
 
-        // 🔊 Decide mute based on interaction
+        // 🔊 Apply mute logic
         video.muted = !userInteracted;
 
         const playPromise = video.play();
@@ -54,6 +74,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (playPromise !== undefined) {
             playPromise.catch((err) => {
                 console.warn("⚠️ Playback failed:", err);
+
+                // 🔁 Retry once after small delay
+                setTimeout(() => {
+                    video.play().catch(e => {
+                        console.warn("❌ Retry failed:", e);
+                    });
+                }, 500);
             });
         }
 
@@ -65,6 +92,15 @@ document.addEventListener("DOMContentLoaded", function () {
             }, 500);
         };
     }
+
+    // 🔄 Resume video if user returns to tab
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && pendingTrigger) {
+            console.log("🔁 Resuming delayed video");
+            playVideo(pendingTrigger);
+            pendingTrigger = null;
+        }
+    });
 
     let socket;
 
@@ -79,7 +115,7 @@ document.addEventListener("DOMContentLoaded", function () {
         socket.onmessage = function(e) {
             const data = JSON.parse(e.data);
 
-            // 🔥 ignore keep-alive ping
+            // 🔥 Ignore ping
             if (data.type === "ping") return;
 
             let trigger = String(data.video_triggered_at);
@@ -110,3 +146,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 </script>
+
