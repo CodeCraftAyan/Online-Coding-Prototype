@@ -25,14 +25,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 # SECRET_KEY = 'django-insecure-z&1hh&k*nts8#^sp=-5mqjeiga+*n#0yuzb-90c!_-l6eph7)h'
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = True
-# ALLOWED_HOSTS = []
+DEBUG = True
+ALLOWED_HOSTS = []
 
-DEBUG = False
-ALLOWED_HOSTS = ['.onrender.com']
+# DEBUG = False
+# ALLOWED_HOSTS = ['.onrender.com']
 
 # DEBUG = False
 # ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
@@ -162,7 +163,10 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": ["rediss://default:gQAAAAAAAT_0AAIncDIxZGNlYTdkZDA4YTg0ODQxODIwYjAzZDdhODhhZGQ3OHAyODE5MDg@electric-kingfish-81908.upstash.io:6379"],
+            "hosts": [{
+                "address": "rediss://default:gQAAAAAAAT_0AAIncDIxZGNlYTdkZDA4YTg0ODQxODIwYjAzZDdhODhhZGQ3OHAyODE5MDg@electric-kingfish-81908.upstash.io:6379",
+                "ssl_cert_reqs": None,
+            }],
         },
     },
 }
