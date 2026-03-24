@@ -30,7 +30,9 @@ Contests
                                     <div class="flex items-center gap-3 text-xs text-gray-500">
                                         <span><i class="bi bi-calendar3"></i> {{ contest.start_time }}</span>
                                         <span><i class="bi bi-clock"></i> {{ contest.duration }} mins</span>
-                                        <span><i class="bi bi-person"></i> {{contest.registrations.count}} participants</span>
+                                        <a href="{% url 'leaderboard' contest.id %}">
+                                            <span><i class="bi bi-person"></i> {{contest.registrations.count}} participants</span>
+                                        </a>
                                     </div>
                                 </div>
                                 
