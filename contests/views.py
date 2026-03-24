@@ -57,6 +57,11 @@ def contest_register(request, contest_id):
             unrated=unrated
         )
 
+        Leaderboard.objects.get_or_create(
+            contest=contest,
+            user=request.user
+        )
+
         messages.success(request, "Successfully registered!")
         return redirect("contest", contest_id=contest.id)
 
@@ -258,6 +263,13 @@ def update_leaderboard_entry(submission):
 
 def leaderboard(request, contest_id):
     contest = get_object_or_404(Contest, id=contest_id)
+
+    registrations = ContestRegistration.objects.filter(contest=contest)
+    for reg in registrations:
+        Leaderboard.objects.get_or_create(
+            contest=contest,
+            user=reg.user
+        )
 
     update_leaderboard(contest)
 
